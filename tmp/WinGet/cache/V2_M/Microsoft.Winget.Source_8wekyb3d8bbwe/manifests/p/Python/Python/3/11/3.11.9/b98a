@@ -1,0 +1,168 @@
+Author: Python Software Foundation
+Commands:
+- py
+- python
+- pythonw
+- pyw
+Copyright: 'Copyright (c) 2001-2024 Python Software Foundation. All Rights Reserved.
+
+  Copyright (c) 2000 BeOpen.com. All Rights Reserved.
+
+  Copyright (c) 1995-2001 Corporation for National Research Initiatives. All Rights
+  Reserved.
+
+  Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam. All Rights Reserved.'
+CopyrightUrl: https://www.python.org/about/legal/
+Documentations:
+- DocumentLabel: Documentation
+  DocumentUrl: https://www.python.org/doc/
+FileExtensions:
+- py
+- pyc
+- pyd
+- pyo
+- pyw
+- pyz
+- pyzw
+InstallerType: burn
+Installers:
+- AppsAndFeaturesEntries:
+  - DisplayName: Python 3.11.9 (32-bit)
+    DisplayVersion: 3.11.9150.0
+    ProductCode: '{b047d2a0-fe22-4d51-ae4c-4fc15fb14b31}'
+    UpgradeCode: '{C2007350-35A9-53B8-9AC1-4EB4C04802E2}'
+  Architecture: x86
+  InstallerSha256: AF19E5E2F03E715A822181F2CB7D4EFEF4EDA13FA4A2DB6DA12E998E46F5CBF9
+  InstallerSwitches:
+    Custom: InstallAllUsers=0 PrependPath=1
+    InstallLocation: DefaultJustForMeTargetDir=<INSTALLPATH>
+  InstallerUrl: https://www.python.org/ftp/python/3.11.9/python-3.11.9.exe
+  ProductCode: '{b047d2a0-fe22-4d51-ae4c-4fc15fb14b31}'
+  Scope: user
+- AppsAndFeaturesEntries:
+  - DisplayName: Python 3.11.9 (32-bit)
+    DisplayVersion: 3.11.9150.0
+    ProductCode: '{b047d2a0-fe22-4d51-ae4c-4fc15fb14b31}'
+    UpgradeCode: '{C2007350-35A9-53B8-9AC1-4EB4C04802E2}'
+  Architecture: x86
+  ElevationRequirement: elevatesSelf
+  InstallerSha256: AF19E5E2F03E715A822181F2CB7D4EFEF4EDA13FA4A2DB6DA12E998E46F5CBF9
+  InstallerSwitches:
+    Custom: InstallAllUsers=1 PrependPath=1
+    InstallLocation: DefaultAllUsersTargetDir=<INSTALLPATH>
+  InstallerUrl: https://www.python.org/ftp/python/3.11.9/python-3.11.9.exe
+  ProductCode: '{b047d2a0-fe22-4d51-ae4c-4fc15fb14b31}'
+  Scope: machine
+- AppsAndFeaturesEntries:
+  - DisplayName: Python 3.11.9 (64-bit)
+    DisplayVersion: 3.11.9150.0
+    ProductCode: '{1da2e09b-199c-4def-9a99-93a8c1b8ddf2}'
+    UpgradeCode: '{767B31EB-0106-5AE3-B46E-77F32D1BABA2}'
+  Architecture: x64
+  InstallerSha256: 5EE42C4EEE1E6B4464BB23722F90B45303F79442DF63083F05322F1785F5FDDE
+  InstallerSwitches:
+    Custom: InstallAllUsers=0 PrependPath=1
+    InstallLocation: DefaultJustForMeTargetDir=<INSTALLPATH>
+  InstallerUrl: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+  ProductCode: '{1da2e09b-199c-4def-9a99-93a8c1b8ddf2}'
+  Scope: user
+- AppsAndFeaturesEntries:
+  - DisplayName: Python 3.11.9 (64-bit)
+    DisplayVersion: 3.11.9150.0
+    ProductCode: '{1da2e09b-199c-4def-9a99-93a8c1b8ddf2}'
+    UpgradeCode: '{767B31EB-0106-5AE3-B46E-77F32D1BABA2}'
+  Architecture: x64
+  ElevationRequirement: elevatesSelf
+  InstallerSha256: 5EE42C4EEE1E6B4464BB23722F90B45303F79442DF63083F05322F1785F5FDDE
+  InstallerSwitches:
+    Custom: InstallAllUsers=1 PrependPath=1
+    InstallLocation: DefaultAllUsersTargetDir=<INSTALLPATH>
+  InstallerUrl: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+  ProductCode: '{1da2e09b-199c-4def-9a99-93a8c1b8ddf2}'
+  Scope: machine
+- AppsAndFeaturesEntries:
+  - DisplayName: Python 3.11.9 (ARM64)
+    DisplayVersion: 3.11.9150.0
+    ProductCode: '{3c1b70e3-48e4-4d2a-b16c-fc68485d2959}'
+    UpgradeCode: '{67E89A38-DE2D-5EC8-8C94-43166EFC6CF3}'
+  Architecture: arm64
+  InstallerSha256: 58F3A4E91B63D5A680ECC77C1DB4565A1E3966E8656D4C8B89200D58C1F5C4F3
+  InstallerSwitches:
+    Custom: InstallAllUsers=0 PrependPath=1
+    InstallLocation: DefaultJustForMeTargetDir=<INSTALLPATH>
+  InstallerUrl: https://www.python.org/ftp/python/3.11.9/python-3.11.9-arm64.exe
+  ProductCode: '{3c1b70e3-48e4-4d2a-b16c-fc68485d2959}'
+  Scope: user
+- AppsAndFeaturesEntries:
+  - DisplayName: Python 3.11.9 (ARM64)
+    DisplayVersion: 3.11.9150.0
+    ProductCode: '{3c1b70e3-48e4-4d2a-b16c-fc68485d2959}'
+    UpgradeCode: '{67E89A38-DE2D-5EC8-8C94-43166EFC6CF3}'
+  Architecture: arm64
+  ElevationRequirement: elevatesSelf
+  InstallerSha256: 58F3A4E91B63D5A680ECC77C1DB4565A1E3966E8656D4C8B89200D58C1F5C4F3
+  InstallerSwitches:
+    Custom: InstallAllUsers=1 PrependPath=1
+    InstallLocation: DefaultAllUsersTargetDir=<INSTALLPATH>
+  InstallerUrl: https://www.python.org/ftp/python/3.11.9/python-3.11.9-arm64.exe
+  ProductCode: '{3c1b70e3-48e4-4d2a-b16c-fc68485d2959}'
+  Scope: machine
+License: PSF-2.0
+LicenseUrl: https://docs.python.org/3/license.html
+Localization:
+- Author: Python Software Foundation
+  Copyright: 'Copyright (c) 2001-2024 Python Software Foundation. All Rights Reserved.
+
+    Copyright (c) 2000 BeOpen.com. All Rights Reserved.
+
+    Copyright (c) 1995-2001 Corporation for National Research Initiatives. All Rights
+    Reserved.
+
+    Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam. All Rights
+    Reserved.'
+  CopyrightUrl: https://www.python.org/about/legal/
+  Documentations:
+  - DocumentLabel: "\u6587\u6863"
+    DocumentUrl: https://www.python.org/doc/
+  License: PSF-2.0
+  LicenseUrl: https://docs.python.org/3/license.html
+  PackageLocale: zh-CN
+  PackageName: Python 3.11
+  PackageUrl: https://www.python.org/
+  PrivacyUrl: https://www.python.org/privacy/
+  Publisher: Python Software Foundation
+  PublisherSupportUrl: https://www.python.org/about/help/
+  PublisherUrl: https://www.python.org/
+  ReleaseNotesUrl: https://docs.python.org/release/3.11.9/whatsnew/changelog.html
+  ShortDescription: "Python \u662F\u4E00\u79CD\u7F16\u7A0B\u8BED\u8A00\uFF0C\u53EF\u4EE5\u8BA9\u60A8\u66F4\u5FEB\u5730\u5DE5\u4F5C\uFF0C\u66F4\u6709\u6548\u5730\u6574\u5408\u60A8\u7684\u7CFB\u7EDF\u3002"
+  Tags:
+  - python
+  - python3
+  - "\u7F16\u7A0B"
+  - "\u7F16\u7A0B\u8BED\u8A00"
+  - "\u811A\u672C"
+  - "\u8BED\u8A00"
+ManifestType: merged
+ManifestVersion: 1.6.0
+Moniker: python3.11
+PackageIdentifier: Python.Python.3.11
+PackageLocale: en-US
+PackageName: Python 3.11
+PackageUrl: https://www.python.org/
+PackageVersion: 3.11.9
+PrivacyUrl: https://www.python.org/privacy/
+Publisher: Python Software Foundation
+PublisherSupportUrl: https://www.python.org/about/help/
+PublisherUrl: https://www.python.org/
+ReleaseDate: 2024-04-02
+ReleaseNotesUrl: https://docs.python.org/release/3.11.9/whatsnew/changelog.html
+ShortDescription: Python is a programming language that lets you work more quickly
+  and integrate your systems more effectively.
+Tags:
+- language
+- programming
+- programming-language
+- python
+- python3
+- script
+UpgradeBehavior: install
