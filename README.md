@@ -38,6 +38,4 @@ streamlit run streamlit_app.py
 - Không commit thư mục `.venv` và các file dữ liệu lớn lên GitHub.
 - Nếu gặp lỗi về thiếu thư viện, hãy kiểm tra lại file `requirements.txt` hoặc cài đặt bổ sung.
 
----
 
-Mọi thắc mắc vui lòng liên hệ chủ repo.
