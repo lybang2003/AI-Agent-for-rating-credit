@@ -3,8 +3,6 @@ import json
 import pandas as pd
 import plotly.graph_objects as go
 from app.agents.plotly_charts import (
-    plot_stock_candlestick, plot_stock_line,
-    plot_revenue_profit, plot_debt_equity, plot_cashflow,
     plot_financial_radar, plot_revenue_treemap, plot_balance_sunburst,
     plot_company_bubble, plot_ratio_boxplot, plot_debt_histogram, plot_stock_animated
 )
@@ -119,33 +117,22 @@ if page == "Main Interface":
                     st.error("JSON features không hợp lệ")
                     features = {}
 
-            col_btn1, col_btn2 = st.columns(2)
-            with col_btn1:
-                if st.button("Predict (một model)"):
-                    result = orchestrator.run({"company": company, "features": features})
-                    pred = result.get("prediction", {})
-                    rating_text = pred.get("rating")
-                    if rating_text:
-                        st.success(f"Mức rating của công ty: {rating_text}")
+            if st.button("Dự đoán rating"):
+                agent = PredictorAgent()
+                both = agent.predict_both(features)
+                results = both.get("results", []) if isinstance(both, dict) else []
+                rating_texts = []
+                if results:
+                    for item in results:
+                        rating = (item or {}).get("rating")
+                        if rating:
+                            rating_texts.append(rating)
+                    if rating_texts:
+                        st.success(f"Mức rating của công ty: {', '.join(rating_texts)}")
                     else:
                         st.warning("Không nhận được kết quả rating")
-                    with st.expander("Giải thích"):
-                        st.json(result.get("explanation", {}))
-            with col_btn2:
-                if st.button("Predict cả hai model"):
-                    agent = PredictorAgent()
-                    both = agent.predict_both(features)
-                    results = both.get("results", []) if isinstance(both, dict) else []
-                    if results:
-                        for item in results:
-                            rating_text = (item or {}).get("rating")
-                            model_path = (item or {}).get("modelPath", "model")
-                            if rating_text:
-                                st.info(f"{model_path}: {rating_text}")
-                            else:
-                                st.warning(f"{model_path}: không có rating")
-                    else:
-                        st.warning("Không nhận được kết quả từ các model")
+                else:
+                    st.warning("Không nhận được kết quả từ các model")
         with col2:
             st.caption("Feature hợp nhất (nếu có)")
             if st.button("Xem feature hợp nhất"):
@@ -286,33 +273,13 @@ if page == "Main Interface":
                     financial_context += "\n\n[NGỮ CẢNH TIN TỨC]\n" + "\n".join(context_snippets)
                 # Giá & realtime: AlphaVantage
                 elif any(kw in user_query.lower() for kw in price_keywords):
-                    # Vẽ biểu đồ giá cổ phiếu
-                    try:
-                        alphavantage_api_key = os.getenv("ALPHAVANTAGE_API_KEY")
-                        fig_line = plot_stock_line(company_intent, alphavantage_api_key)
-                        st.plotly_chart(fig_line, use_container_width=True)
-                        fig_candle = plot_stock_candlestick(company_intent, alphavantage_api_key)
-                        st.plotly_chart(fig_candle, use_container_width=True)
-                        # Có thể thêm volume chart nếu cần
-                    except Exception as e:
-                        st.error(f"Lỗi vẽ biểu đồ giá cổ phiếu: {e}")
+                    st.info("Chức năng vẽ biểu đồ giá cổ phiếu từ API web đã bị loại bỏ. Chỉ hỗ trợ vẽ từ dữ liệu CSV nội bộ.")
                 # Tin tức tài chính, insider, earnings: Finnhub
                 elif any(kw in user_query.lower() for kw in finnhub_keywords):
-                    news_data = get_finnhub_news(company_intent)
-                    if news_data:
-                        financial_context += "\n\n[FINNHUB NEWS]\n" + str(news_data)
+                    st.info("Chức năng lấy tin tức tài chính từ API web đã bị loại bỏ. Chỉ hỗ trợ dữ liệu CSV nội bộ.")
                 # Financial ratios & statements: FMP
                 elif any(kw.lower() in user_query.lower() for kw in ratio_keywords):
-                    try:
-                        financial_api_key = os.getenv("FINANCIAL_API_KEY")
-                        fig_revenue = plot_revenue_profit(company_intent, financial_api_key)
-                        st.plotly_chart(fig_revenue, use_container_width=True)
-                        fig_debt = plot_debt_equity(company_intent, financial_api_key)
-                        st.plotly_chart(fig_debt, use_container_width=True)
-                        fig_cashflow = plot_cashflow(company_intent, financial_api_key)
-                        st.plotly_chart(fig_cashflow, use_container_width=True)
-                    except Exception as e:
-                        st.error(f"Lỗi vẽ biểu đồ tài chính: {e}")
+                    st.info("Chức năng vẽ biểu đồ tài chính từ API web đã bị loại bỏ. Chỉ hỗ trợ vẽ từ dữ liệu CSV nội bộ.")
             # Lưu câu hỏi vào lịch sử
             st.session_state["chat_history"].append({"role": "user", "content": user_query})
             # Ưu tiên lấy ngữ cảnh từ data CSV
@@ -379,9 +346,10 @@ if page == "Main Interface":
 
 else:  # Tools Interface
     st.title("Tools Interface")
-    tab_tools = st.tabs(["Query CSV", "Query Financial Metrics"])
+    tab_tools = st.tabs(["Query CSV", "Query Financial Metrics", "Vẽ biểu đồ từ CSV"])
 
-    with tab_tools[0]:  # Query CSV
+    # Tab 1: Query CSV
+    with tab_tools[0]:
         st.subheader("Truy vấn dữ liệu nội bộ")
         dq = CSVDataQuery()
         all_metrics = [
@@ -443,3 +411,86 @@ else:  # Tools Interface
                         st.dataframe(df_all[[company_cols[0], date_cols[0]] + available_metrics])
             else:
                 st.warning("Không tìm thấy file dữ liệu nào!")
+
+    # Tab 3: Vẽ biểu đồ từ CSV
+    with tab_tools[2]:
+        st.subheader("Vẽ biểu đồ")
+        import importlib
+        plotly_charts = importlib.import_module("app.agents.plotly_charts")
+        csv_file = st.selectbox("Chọn file CSV", ["corporateCreditRatingWithFinancialRatios.csv", "corporate_rating.csv"])
+        if os.path.exists(csv_file):
+            df = pd.read_csv(csv_file)
+            columns = df.columns.tolist()
+            chart_type = st.selectbox(
+                "Loại biểu đồ",
+                [
+                    "scatter", "line", "bar", "box", "histogram",
+                    "financial_radar", "revenue_treemap", "balance_sunburst", "company_bubble", "ratio_boxplot", "debt_histogram"
+                ],
+                help="Chọn loại biểu đồ cơ bản hoặc nâng cao (dựa trên plotly_charts.py)"
+            )
+            color_col = st.selectbox("Cột màu (tuỳ chọn)", [None] + columns)
+
+            # Hiển thị các trường nhập động tuỳ loại biểu đồ
+            if chart_type in ["scatter", "line", "bar", "box", "histogram"]:
+                x_col = st.selectbox("Chọn cột X", options=columns)
+                y_col = st.selectbox("Chọn cột Y", options=columns)
+            elif chart_type == "financial_radar":
+                company_col = st.selectbox("Cột công ty", options=columns)
+                metrics = st.multiselect("Chọn các chỉ số (metrics)", options=columns)
+            elif chart_type == "revenue_treemap":
+                segment_col = st.selectbox("Cột segment", options=columns)
+                revenue_col = st.selectbox("Cột revenue", options=columns)
+            elif chart_type == "balance_sunburst":
+                category_col = st.selectbox("Cột category", options=columns)
+                subcategory_col = st.selectbox("Cột subcategory", options=columns)
+                amount_col = st.selectbox("Cột amount", options=columns)
+            elif chart_type == "company_bubble":
+                assets_col = st.selectbox("Cột assets", options=columns)
+                revenue_col = st.selectbox("Cột revenue", options=columns)
+                market_cap_col = st.selectbox("Cột market_cap", options=columns)
+                sector_col = st.selectbox("Cột sector", options=columns)
+                company_col = st.selectbox("Cột company", options=columns)
+            elif chart_type == "ratio_boxplot":
+                sector_col = st.selectbox("Cột sector", options=columns)
+                ratio_col = st.selectbox("Cột ratio", options=columns)
+            elif chart_type == "debt_histogram":
+                debt_ratio_col = st.selectbox("Cột debt_ratio", options=columns)
+
+            if st.button("Vẽ biểu đồ"):
+                import plotly.express as px
+                try:
+                    fig = None
+                    if chart_type == "scatter":
+                        fig = px.scatter(df, x=x_col, y=y_col, color=color_col if color_col else None, title=f"{y_col} vs {x_col}")
+                    elif chart_type == "line":
+                        fig = px.line(df, x=x_col, y=y_col, color=color_col if color_col else None, title=f"{y_col} theo {x_col}")
+                    elif chart_type == "bar":
+                        fig = px.bar(df, x=x_col, y=y_col, color=color_col if color_col else None, title=f"{y_col} theo {x_col}")
+                    elif chart_type == "box":
+                        fig = px.box(df, x=x_col, y=y_col, color=color_col if color_col else None, title=f"Boxplot {y_col} theo {x_col}")
+                    elif chart_type == "histogram":
+                        fig = px.histogram(df, x=x_col, color=color_col if color_col else None, title=f"Histogram {x_col}")
+                    elif chart_type == "financial_radar":
+                        fig = plotly_charts.plot_financial_radar(df, metrics, company_col=company_col, title="So sánh chỉ số tài chính")
+                    elif chart_type == "revenue_treemap":
+                        treemap_df = df[[segment_col, revenue_col]].rename(columns={segment_col: "segment", revenue_col: "revenue"})
+                        fig = plotly_charts.plot_revenue_treemap(treemap_df, title="Cơ cấu doanh thu theo mảng")
+                    elif chart_type == "balance_sunburst":
+                        sunburst_df = df[[category_col, subcategory_col, amount_col]].rename(columns={category_col: "category", subcategory_col: "subcategory", amount_col: "amount"})
+                        fig = plotly_charts.plot_balance_sunburst(sunburst_df, title="Cơ cấu tài sản - nợ")
+                    elif chart_type == "company_bubble":
+                        bubble_df = df[[assets_col, revenue_col, market_cap_col, sector_col, company_col]].rename(columns={assets_col: "assets", revenue_col: "revenue", market_cap_col: "market_cap", sector_col: "sector", company_col: "company"})
+                        fig = plotly_charts.plot_company_bubble(bubble_df, title="So sánh doanh nghiệp")
+                    elif chart_type == "ratio_boxplot":
+                        fig = plotly_charts.plot_ratio_boxplot(df, ratio=ratio_col, title="Phân phối chỉ số theo ngành")
+                    elif chart_type == "debt_histogram":
+                        fig = plotly_charts.plot_debt_histogram(df.rename(columns={debt_ratio_col: "debt_ratio"}), title="Phân bố Debt Ratio")
+                    else:
+                        st.warning("Loại biểu đồ không hỗ trợ!")
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Lỗi vẽ biểu đồ: {e}")
+        else:
+            st.warning("Không tìm thấy file dữ liệu!")
