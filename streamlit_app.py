@@ -28,7 +28,7 @@ from app.agents.financial_ratios import (
 from tavily import TavilyClient
 
 from app.graph.orchestrator import orchestrator
-from app.agents.ml_report import PredictorAgent
+from app.agents.ml_report import PredictorAgent, InvestmentPredictorAgent
 from app.etl.loader import load_csv_to_storage
 from app.agents.ml_report import ReporterAgent
 from app.config import settings
@@ -61,32 +61,47 @@ if page == "Main Interface":
 
     with tab_predict:
         st.subheader("Dự đoán rating")
-        col1, col2 = st.columns(2)
-        with col1:
-            company = st.text_input("Tên công ty", value="ACME Corp")
-                # as_of = st.text_input("As-of date (YYYY-MM-DD)", value="2025-09-30")
+        
+        # Company input ở trên cùng
+        company = st.text_input("Tên công ty", value="ACME Corp")
 
-            input_mode = st.radio("Chế độ nhập features", ["Form", "JSON"], horizontal=True)
-            features: dict = {}
+        # Input mode
+        input_mode = st.radio("Chế độ nhập features", ["Form", "JSON"], horizontal=True)
+        features: dict = {}
 
-            if input_mode == "Form":
-                st.markdown("#### Chỉ số tài chính")
-                currentRatio = st.number_input("currentRatio", value=2.1, step=0.1)
-                longTermDebtToCapital = st.number_input("longTermDebtToCapital", value=0.4, step=0.1)
-                debtEquityRatio = st.number_input("debtEquityRatio", value=0.8, step=0.1)
-                grossMargin = st.number_input("grossMargin", value=45.0, step=0.1)
-                operatingMargin = st.number_input("operatingMargin", value=20.0, step=0.1)
-                ebitMargin = st.number_input("ebitMargin", value=18.0, step=0.1)
-                ebitdaMargin = st.number_input("ebitdaMargin", value=25.0, step=0.1)
-                preTaxProfitMargin = st.number_input("preTaxProfitMargin", value=15.0, step=0.1)
-                netProfitMargin = st.number_input("netProfitMargin", value=12.0, step=0.1)
-                assetTurnover = st.number_input("assetTurnover", value=0.9, step=0.1)
-                returnOnEquity = st.number_input("returnOnEquity", value=10.0, step=0.1)
-                returnOnTangibleEquity = st.number_input("returnOnTangibleEquity", value=9.0, step=0.1)
-                returnOnAssets = st.number_input("returnOnAssets", value=7.0, step=0.1)
-                returnOnInvestment = st.number_input("returnOnInvestment", value=8.0, step=0.1)
-                operatingCashFlowPerShare = st.number_input("operatingCashFlowPerShare", value=5.0, step=0.1)
-                freeCashFlowPerShare = st.number_input("freeCashFlowPerShare", value=3.0, step=0.1)
+        if input_mode == "Form":
+            st.markdown("#### Chỉ số tài chính")
+        
+            # Tạo 4 cột cho form để tận dụng toàn bộ không gian
+            col_form1, col_form2, col_form3, col_form4 = st.columns(4)
+            
+            with col_form1:
+                st.markdown("**💰 Chỉ số lợi nhuận**")
+                grossMargin = st.number_input("Gross Margin (%)", value=45.0, step=0.1, help="Tỷ suất lợi nhuận gộp")
+                operatingMargin = st.number_input("Operating Margin (%)", value=20.0, step=0.1, help="Tỷ suất lợi nhuận hoạt động")
+                ebitMargin = st.number_input("EBIT Margin (%)", value=18.0, step=0.1, help="Tỷ suất lợi nhuận trước lãi vay")
+                ebitdaMargin = st.number_input("EBITDA Margin (%)", value=25.0, step=0.1, help="Tỷ suất lợi nhuận trước khấu hao")
+                preTaxProfitMargin = st.number_input("Pre-tax Profit Margin (%)", value=15.0, step=0.1, help="Tỷ suất lợi nhuận trước thuế")
+                netProfitMargin = st.number_input("Net Profit Margin (%)", value=12.0, step=0.1, help="Tỷ suất lợi nhuận ròng")
+                
+            with col_form2:
+                st.markdown("**📈 Chỉ số hiệu quả & ROI**")
+                assetTurnover = st.number_input("Asset Turnover", value=0.9, step=0.1, help="Hiệu suất sử dụng tài sản")
+                returnOnEquity = st.number_input("Return on Equity (%)", value=10.0, step=0.1, help="Tỷ suất sinh lời trên vốn chủ sở hữu")
+                returnOnTangibleEquity = st.number_input("Return on Tangible Equity (%)", value=9.0, step=0.1, help="Tỷ suất sinh lời trên vốn chủ sở hữu hữu hình")
+                returnOnAssets = st.number_input("Return on Assets (%)", value=7.0, step=0.1, help="Tỷ suất sinh lời trên tài sản")
+                returnOnInvestment = st.number_input("Return on Investment (%)", value=8.0, step=0.1, help="Tỷ suất sinh lời trên đầu tư")
+            
+            with col_form3:
+                st.markdown("**📊 Chỉ số thanh khoản & Nợ**")
+                currentRatio = st.number_input("Current Ratio", value=2.1, step=0.1, help="Tỷ số thanh khoản hiện tại")
+                longTermDebtToCapital = st.number_input("Long Term Debt/Capital", value=0.4, step=0.1, help="Tỷ số nợ dài hạn/vốn")
+                debtEquityRatio = st.number_input("Debt/Equity Ratio", value=0.8, step=0.1, help="Tỷ số nợ/vốn chủ sở hữu")
+            
+            with col_form4:
+                st.markdown("**💵 Dòng tiền**")
+                operatingCashFlowPerShare = st.number_input("Operating Cash Flow/Share", value=5.0, step=0.1, help="Dòng tiền hoạt động trên mỗi cổ phiếu")
+                freeCashFlowPerShare = st.number_input("Free Cash Flow/Share", value=3.0, step=0.1, help="Dòng tiền tự do trên mỗi cổ phiếu")
 
                 features = {
                     "currentRatio": float(currentRatio),
@@ -106,7 +121,7 @@ if page == "Main Interface":
                     "operatingCashFlowPerShare": float(operatingCashFlowPerShare),
                     "freeCashFlowPerShare": float(freeCashFlowPerShare),
                 }
-            else:
+        else:
                 features_text = st.text_area(
                     "Features JSON",
                     value='{"currentRatio": 2.1, "debtEquityRatio": 0.8, "grossMargin": 45.0}',
@@ -117,29 +132,115 @@ if page == "Main Interface":
                     st.error("JSON features không hợp lệ")
                     features = {}
 
-            if st.button("Dự đoán rating"):
-                agent = PredictorAgent()
-                both = agent.predict_both(features)
-                results = both.get("results", []) if isinstance(both, dict) else []
-                rating_texts = []
-                if results:
-                    for item in results:
-                        rating = (item or {}).get("rating")
-                        if rating:
-                            rating_texts.append(rating)
-                    if rating_texts:
-                        st.success(f"Mức rating của công ty: {', '.join(rating_texts)}")
-                    else:
-                        st.warning("Không nhận được kết quả rating")
+        if st.button("Dự đoán rating"):
+            agent = PredictorAgent()
+            both = agent.predict_both(features)
+            results = both.get("results", []) if isinstance(both, dict) else []
+            rating_texts = []
+            if results:
+                for item in results:
+                    rating = (item or {}).get("rating")
+                    if rating:
+                        rating_texts.append(rating)
+                if rating_texts:
+                    # Lưu kết quả vào session state
+                    st.session_state["rating_result"] = {
+                        "success": True,
+                        "rating": ', '.join(rating_texts)
+                    }
+                    # st.success("✅ Đã dự đoán rating thành công! Kết quả được lưu bên dưới.")
                 else:
-                    st.warning("Không nhận được kết quả từ các model")
-        with col2:
-            st.caption("Feature hợp nhất (nếu có)")
-            if st.button("Xem feature hợp nhất"):
-                result = orchestrator.run({"company": company, "features": features})
-                df = pd.DataFrame([result.get("features", {})]).T
-                df.columns = ["value"]
-                st.dataframe(df)
+                    st.session_state["rating_result"] = {"success": False, "message": "Không nhận được kết quả rating"}
+                    st.warning("Không nhận được kết quả rating")
+            else:
+                st.session_state["rating_result"] = {"success": False, "message": "Không nhận được kết quả từ các model"}
+                st.warning("Không nhận được kết quả từ các model")
+        
+        # Hiển thị kết quả rating từ session state (nếu có)
+        if "rating_result" in st.session_state:
+            rating_result = st.session_state["rating_result"]
+            
+            st.markdown("### 📊 Kết quả dự đoán rating")
+            
+            if rating_result["success"]:
+                st.success(f"✅ **Mức rating của công ty {company}**: {rating_result['rating']}")
+            else:
+                st.error(f"⚠️ **Lỗi**: {rating_result['message']}")
+        
+        st.divider()
+        st.subheader("Dự đoán đầu tư")
+        st.caption("Dựa trên các chỉ số tài chính đã nhập ở trên")
+        
+
+        # Chức năng dự đoán đầu tư
+        if st.button("Dự đoán đầu tư", key="invest_predict"):
+            try:
+                investment_agent = InvestmentPredictorAgent()
+                result = investment_agent.predict_investment(features)
+                recommendation = investment_agent.get_investment_recommendation(features)
+                
+                # Lưu kết quả vào session state
+                st.session_state["investment_result"] = {
+                    "result": result,
+                    "recommendation": recommendation
+                }
+                
+                # st.success("✅ Đã dự đoán đầu tư thành công! Kết quả được lưu bên dưới.")
+                    
+            except Exception as e:
+                st.error(f"Lỗi dự đoán đầu tư: {e}")
+        
+        # Hiển thị kết quả dự đoán đầu tư từ session state (nếu có)
+        if "investment_result" in st.session_state:
+            investment_data = st.session_state["investment_result"]
+            result = investment_data["result"]
+            recommendation = investment_data["recommendation"]
+            
+            st.markdown("### 💰 Kết quả dự đoán đầu tư")
+            
+            # Kết quả chính - đơn giản hóa
+            if result["invest"]:
+                st.success(f"✅ **KHUYẾN NGHỊ ĐẦU TƯ** - Xác suất: {result['probability']:.1%}")
+            else:
+                st.error(f"❌ **KHÔNG NÊN ĐẦU TƯ** - Xác suất: {result['probability']:.1%}")
+            
+            # Metrics gọn gàng
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Độ tin cậy", f"{result['confidence']:.1%}")
+            with col2:
+                st.metric("Mức rủi ro", recommendation['risk_level'])
+            with col3:
+                st.metric("Model", result['model_version'])
+            
+            # Khuyến nghị chi tiết - đơn giản
+            st.markdown("#### Khuyến nghị")
+            st.write(f"**{recommendation['recommendation']}**")
+            
+            # Lý do ngắn gọn
+            st.markdown("#### Lý do")
+            st.write(recommendation['reasoning'])
+            
+            # AI Explanation nếu có
+            if 'ai_explanation' in recommendation:
+                st.markdown("#### Giải thích")
+                st.write(recommendation['ai_explanation'])
+            
+            # Thông tin kỹ thuật trong expander
+            with st.expander("Chi tiết kỹ thuật"):
+                if result.get('features_padded'):
+                    st.info(f"Model cần {result['features_used']} features, đã bổ sung {result['features_used'] - result['features_provided']} giá trị mặc định.")
+                
+                if result.get('error'):
+                    st.warning(f"Lỗi: {result['error']}")
+                
+                st.json({
+                    "invest": recommendation['invest'],
+                    "confidence": recommendation['confidence'],
+                    "probability": recommendation['probability'],
+                    "model_version": recommendation['model_version']
+                })
+
 
         st.divider()
         st.subheader("Chat hỏi đáp")
@@ -165,7 +266,7 @@ if page == "Main Interface":
             # Trợ lý vẽ biểu đồ: nếu ngữ cảnh có đủ dữ liệu, tự động vẽ và trả lời
             def try_plot_from_context(user_query, company_intent, year_intent):
                 import pandas as pd
-                csv_path = "d:\LLM\corporateCreditRatingWithFinancialRatios.csv"
+                csv_path = "corporateCreditRatingWithFinancialRatios.csv"
                 if not os.path.exists(csv_path):
                     return None, "Không tìm thấy file dữ liệu!"
                 df = pd.read_csv(csv_path)
@@ -215,7 +316,7 @@ if page == "Main Interface":
                         st.info(plot_error + "\nBạn có thể bổ sung dữ liệu hoặc upload file mới để vẽ biểu đồ.")
                     # Tiếp tục lấy ngữ cảnh như cũ
                     year_int = year_intent if year_intent else None
-                    csv_path = "d:\LLM\corporateCreditRatingWithFinancialRatios.csv"
+                    csv_path = "corporateCreditRatingWithFinancialRatios.csv"
                     context_text = get_credit_context(csv_path, company_intent, year_int)
                     if "Không tìm thấy dữ liệu phù hợp" in context_text or "Không tìm thấy file dữ liệu" in context_text:
                         context_snippets = []
@@ -284,7 +385,7 @@ if page == "Main Interface":
             st.session_state["chat_history"].append({"role": "user", "content": user_query})
             # Ưu tiên lấy ngữ cảnh từ data CSV
             year_int = year_intent if 'year_intent' in locals() and year_intent else None
-            csv_path = "d:\LLM\corporateCreditRatingWithFinancialRatios.csv"
+            csv_path = "corporateCreditRatingWithFinancialRatios.csv"
             context_text = get_credit_context(csv_path, company_intent, year_int)
             # Nếu không có dữ liệu phù hợp, fallback sang web
             if "Không tìm thấy dữ liệu phù hợp" in context_text or "Không tìm thấy file dữ liệu" in context_text:

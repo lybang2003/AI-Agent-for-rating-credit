@@ -1,7 +1,8 @@
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
-load_dotenv()
+# Nạp .env chắc chắn từ thư mục gốc dự án, cho phép override biến môi trường
+load_dotenv(find_dotenv(usecwd=True), override=True)
 
 
 class Settings:
